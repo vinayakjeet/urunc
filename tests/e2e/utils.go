@@ -185,8 +185,7 @@ func findLineInFile(filePath string, pattern string) (string, error) {
 	return "", fmt.Errorf("Pattern %s was not found in any line of %s", pattern, filePath)
 }
 
-func loadTestCases(tool string) ([]containerTestArgs, error) {
-	configFile := "config.json"
+func loadTestCases(configFile, tool string) ([]containerTestArgs, error) {
 	data, err := os.ReadFile(configFile)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read config file: %w", err)
