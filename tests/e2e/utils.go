@@ -16,6 +16,7 @@ package urunce2etesting
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/user"
@@ -182,4 +183,47 @@ func findLineInFile(filePath string, pattern string) (string, error) {
 	}
 
 	return "", fmt.Errorf("Pattern %s was not found in any line of %s", pattern, filePath)
+}
+
+func loadTestCases(tool string) ([]containerTestArgs, error) {
+	configFile := "config.json"
+	data, err := os.ReadFile(configFile)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read config file: %w", err)
+	}
+
+	var allTests map[string][]containerTestArgs
+	if err := json.Unmarshal(data, &allTests); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
+	}
+
+	tests, ok := allTests[tool]
+	if !ok {
+		return nil, fmt.Errorf("no tests found for tool: %s", tool)
+	}
+
+	for i := range tests {
+		switch tests[i].TestFuncName {
+		case "matchTest":
+			tests[i].TestFunc = nil
+		case "pingTest":
+			tests[i].TestFunc = pingTest
+		case "seccompTest":
+			tests[i].TestFunc = seccompTest
+		case "userGroupTest":
+			tests[i].TestFunc = userGroupTest
+		case "namespaceTest":
+			tests[i].TestFunc = namespaceTest
+		case "blockMountTest":
+			tests[i].TestFunc = blockMountTest
+		case "httpStaticNetTest":
+			tests[i].TestFunc = httpStaticNetTest
+		default:
+			if tests[i].TestFuncName != "" {
+				return nil, fmt.Errorf("unknown test function: %s", tests[i].TestFuncName)
+			}
+		}
+	}
+
+	return tests, nil
 }

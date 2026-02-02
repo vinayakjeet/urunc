@@ -25,26 +25,27 @@ import (
 type testMethod func(tool testTool) error
 
 type containerVolume struct {
-	Source string
-	Dest   string
+	Source string `json:"source"`
+	Dest   string `json:"dest"`
 }
 
 type containerTestArgs struct {
-	Name           string
-	Image          string
-	Devmapper      bool
-	Seccomp        bool
-	UID            int
-	GID            int
-	Groups         []int64
-	Memory         string
-	Cli            string
-	Volumes        []containerVolume
-	StaticNet      bool
-	SideContainers []string
-	Skippable      bool
-	TestFunc       testMethod
-	ExpectOut      string
+	Name           string            `json:"name"`
+	Image          string            `json:"image"`
+	Devmapper      bool              `json:"devmapper"`
+	Seccomp        bool              `json:"seccomp"`
+	UID            int               `json:"uid"`
+	GID            int               `json:"gid"`
+	Groups         []int64           `json:"groups"`
+	Memory         string            `json:"memory"`
+	Cli            string            `json:"cli"`
+	Volumes        []containerVolume `json:"volumes"`
+	StaticNet      bool              `json:"staticNet"`
+	SideContainers []string          `json:"sideContainers"`
+	Skippable      bool              `json:"skippable"`
+	TestFunc       testMethod        `json:"-"`
+	TestFuncName   string            `json:"testFuncName"`
+	ExpectOut      string            `json:"expectOut"`
 }
 
 func runTest(tool testTool, t *testing.T) {
